@@ -12,7 +12,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Copy the parent `.env.example` to the parent `.env` (or create a backend `.env`) and set `DJANGO_SECRET_KEY`, `AUTHORIZED_USERNAMES` to exactly two distinct usernames, and `DATABASE_URL`. The server refuses to start unless both account names are configured. Then:
+Copy `.env.example` to `.env` in this directory and set `DJANGO_SECRET_KEY`, `AUTHORIZED_USERNAMES` to exactly two distinct usernames, and `DATABASE_URL`. The server refuses to start unless both account names are configured. Then:
 
 ```sh
 python manage.py migrate
