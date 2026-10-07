@@ -106,6 +106,10 @@ sudo -u privatechat /opt/our-app/backend/.venv/bin/python manage.py test account
 
 Create the two authorized user accounts after the usernames are chosen. Use Django's password prompts or another secure interactive method. No public registration endpoint exists. Verify both users can obtain tokens and an unrelated account cannot.
 
+For the initial VM bootstrap, randomly generated passwords for the two authorized users are held outside Git in `/etc/our-app/bootstrap-credentials.txt` (root-owned, mode `0600`). Retrieve them only over SSH with `sudo cat /etc/our-app/bootstrap-credentials.txt`; keep them private. After saving them securely, rotate each through the interactive Django `changepassword` command and remove the bootstrap file.
+
+The current `check --deploy` output has two intentional warnings: `security.W005` because HSTS is not applied to subdomains, and `security.W021` because this DuckDNS hostname is not configured for browser preload. Leave both disabled unless the hostname's future subdomain and preload policy are explicitly reviewed.
+
 ## Deploy/update and rollback
 
 Run deployment commands as the deployment owner from `/opt/our-app/backend`:
