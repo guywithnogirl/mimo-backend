@@ -1,6 +1,6 @@
 # Private Chat Backend
 
-Django REST API for a private conversation between exactly two configured accounts. The production layout uses Nginx, Gunicorn with the supported Uvicorn worker package, Django ASGI, and PostgreSQL. The API currently provides JWT authentication and a database-backed health endpoint. Channels, WebSockets, messages, FCM, and media are not implemented yet.
+Django REST API for a private conversation between exactly two configured accounts. The production layout uses Nginx, Gunicorn with the supported Uvicorn worker package, Django ASGI, and PostgreSQL. The API provides JWT authentication, a database-backed health endpoint, and REST conversation/message endpoints. Channels, WebSockets, FCM, and media are not implemented yet.
 
 ## Local setup
 
@@ -22,6 +22,10 @@ python manage.py runserver 127.0.0.1:8000
 ```
 
 The JWT endpoints are `POST /api/auth/token/` and `POST /api/auth/token/refresh/`. `GET /api/auth/me/` requires a valid access token. `GET /api/health/` checks database connectivity and returns only `ok` or `unavailable`. There is no registration API. Create the two intended users through Django administration.
+
+## Conversation and messages
+
+The first authorized request to `GET /api/conversations/` creates the single conversation for the two configured usernames if it does not exist. The endpoint returns a one-item array. `GET /api/conversations/{id}/` returns it only to one of its two members. Messages are read and sent at `GET|POST /api/conversations/{id}/messages/`. Message reads are ordered by `created_at` and UUID and use page-number pagination (50 by default, up to 100 with `page_size`). Message creation accepts only `content`; sender and timestamp are assigned by the server. Content is trimmed, required, and limited to 4,000 characters. There is no general conversation creation or membership API.
 
 ## Production architecture
 
@@ -101,7 +105,7 @@ sudo -u privatechat /opt/our-app/backend/.venv/bin/python manage.py check
 sudo -u privatechat /opt/our-app/backend/.venv/bin/python manage.py check --deploy
 sudo -u privatechat /opt/our-app/backend/.venv/bin/python manage.py migrate
 sudo -u privatechat /opt/our-app/backend/.venv/bin/python manage.py collectstatic --noinput
-sudo -u privatechat /opt/our-app/backend/.venv/bin/python manage.py test accounts
+sudo -u privatechat /opt/our-app/backend/.venv/bin/python manage.py test accounts messaging
 ```
 
 Create the two authorized user accounts after the usernames are chosen. Use Django's password prompts or another secure interactive method. No public registration endpoint exists. Verify both users can obtain tokens and an unrelated account cannot.
